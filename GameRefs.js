@@ -2,7 +2,7 @@ var request     = require('request');
 var cheerio     = require('cheerio');
 var fs          = require('fs');
 
-var link = "http://www.afpbarcelos.pt/noticias?page=9";
+var link = "http://www.afpbarcelos.pt/noticias";
 var nextPageLink = null;
 var min_date = new Date("2017-01-01");
 var max_date = new Date("2018-06-01");
@@ -12,9 +12,9 @@ var csv_data = "";
 
 //console.log("Searching between " + min_date + " and " + max_date);
 
-readNews();
+readNews(writeCsvFile);
 
-function readNews() {
+function readNews(callback) {
 
     var $ = null;
 
@@ -58,6 +58,8 @@ function readNews() {
         }
 
     });
+
+    callback();
 
 }
 
@@ -141,9 +143,32 @@ function inspectNews(link) {
             str_teams = str_teams.substring(1, str_teams.length - 1);
             teams = str_teams.split(/\s+\x\s+/g, 2);
 
+            csv_data += 
+                date + ";" +
+                teams[0] + ";" +
+                teams[1] + ";" +
+                competition + ";" +
+                referee + "\n";
             
         });
 
     });
+
+}
+
+function writeCsvFile() {
+
+    console.log("Writting File...");
+
+    var filename = "output/output" +  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); + ".csv";
+
+    fs.writeFile(filename, csv_data, 'utf8', function(error) {
+
+        if (error)
+            console.log("Error writing file!");
+
+    });
+
+    console.log("Finished");
 
 }
