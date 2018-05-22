@@ -43,7 +43,7 @@ function readNews() {
             }
             
             //Se for uma data mais recente que a que queremos, ignora
-            if (date.getTime() < max_date.getTime() && title === "ÁRBITROS NOMEADOS") {
+            if (date.getTime() < max_date.getTime() && (title.match("ÁRBITROS NOMEADOS") || title.match("Árbitros Nomeados"))) {
                 console.log('Found Match!');
                 inspectNews(link);
             }
@@ -74,12 +74,31 @@ function inspectNews(link) {
             if (i === 0)
                 return;
 
-            var date = $(this).children('td:nth-child(1)').text().trim();
-            var teams = $(this).children('td:nth-child(3)').text().trim().split(" X ");
-            var ref = $(this).children('td:nth-child(5)').text().trim();
-            var competition = $(this).children('td:nth-child(4)').text().trim();
+            let linha = "";
+            let match = null;
             
-            console.log(date + " - " + competition + " - " + teams + " - " + ref);
+            let competition = "";
+            let referee = "";
+            let date;
+
+            var tds = $(this).children('td');
+
+            for (let i = 0; i < tds.length; i++) {
+
+                linha += $(tds[i]).text().trim();
+
+                if (i + 1 < tds.length)
+                    linha += "|";
+                else
+                    linha += ",";
+
+            }
+
+            linha = linha.toLowerCase();
+            linha = linha.replace(/\./g, '');
+
+            //Get Competition - (\|([a-z\.]+\s)*[0-9]\ª\s[a-z\ã]+\|)|(\|[a-z\.\ç]+\|)|(\|[a-z\.\ç]+\s[a-z\.\ç]+\|)
+
         });
 
     });
