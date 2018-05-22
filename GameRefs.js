@@ -4,15 +4,15 @@ var fs          = require('fs');
 
 var link = "http://www.afpbarcelos.pt/noticias";
 var nextPageLink = null;
-var min_date = new Date("2017-01-01");
+var min_date = new Date("2017-08-30");
 var max_date = new Date("2018-06-01");
 var exit = false;
 
 var csv_data = "";
 
-//console.log("Searching between " + min_date + " and " + max_date);
+console.log("Searching between " + min_date + " and " + max_date);
 
-readNews(writeCsvFile);
+readNews();
 
 function readNews(callback) {
 
@@ -20,7 +20,7 @@ function readNews(callback) {
 
     request(link, function(error, response, body) {
 
-        //console.log("Requesting " + link);
+        console.log("Requesting " + link);
     
         $ = cheerio.load(body);
         
@@ -46,7 +46,7 @@ function readNews(callback) {
             
             //Se for uma data mais recente que a que queremos, ignora
             if (date.getTime() < max_date.getTime() && (title === "ÁRBITROS NOMEADOS" || title === "Árbitros Nomeados")) {
-                //console.log('Found Match!');
+                console.log('Found a Referees Post!');
                 inspectNews(link);
             }
 
@@ -55,19 +55,19 @@ function readNews(callback) {
         if (!exit) {
             link = nextPageLink;
             readNews();
+        } else {
+            console.log("Done!");
+            setTimeout(writeCsvFile, 2000);
         }
 
     });
-
-    callback();
-
 }
 
 function inspectNews(link) {
 
     var $ = null;
     
-    //console.log("Inspecting referees at " + link);
+    console.log("Inspecting referees at " + link);
 
     request(link, function(error, response, body) {
 
@@ -83,7 +83,7 @@ function inspectNews(link) {
             
             let competition = "";
             let referee = "";
-            let date;
+            let date = "";
             let teams;
 
             var tds = $(this).children('td');
@@ -130,11 +130,11 @@ function inspectNews(link) {
 
             if (match) {
                 splited = match.toString().split(/\-|\//g, 3);
-                date = new Date(splited[0] + "-" + splited[1] + "-" + splited[2]);
+                date = splited[0] + "-" + splited[1] + "-" + splited[2];
             } else {
                 match = linha.match(/[0-9]{2}(\-|\/)[0-9]{2}(\-|\/)[0-9]{4}/g);
                 splited = match.toString().split(/\-|\//g, 3);
-                date = new Date(splited[2] + "-" + splited[1] + "-" + splited[0]);
+                date = splited[2] + "-" + splited[1] + "-" + splited[0];
             }
 
             //Get Teams - \|[a-z\s\.\à\á\ã\â\è\é\ê\ì\í\ò\ó\õ\ô\ù\ú\ç\«\»]+\s+\x\s+[a-z\s\.\à\á\ã\â\è\é\ê\ì\í\ò\ó\õ\ô\ù\ú\ç\«\»]+\|
@@ -160,7 +160,7 @@ function writeCsvFile() {
 
     console.log("Writting File...");
 
-    var filename = "output/output" +  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); + ".csv";
+    var filename = "output/output-" +  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + ".csv";
 
     fs.writeFile(filename, csv_data, 'utf8', function(error) {
 
