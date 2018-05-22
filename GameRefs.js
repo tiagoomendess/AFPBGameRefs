@@ -8,6 +8,8 @@ var min_date = new Date("2017-01-01");
 var max_date = new Date("2018-06-01");
 var exit = false;
 
+var csv_data = "";
+
 //console.log("Searching between " + min_date + " and " + max_date);
 
 readNews();
@@ -80,6 +82,7 @@ function inspectNews(link) {
             let competition = "";
             let referee = "";
             let date;
+            let teams;
 
             var tds = $(this).children('td');
 
@@ -132,9 +135,13 @@ function inspectNews(link) {
                 date = new Date(splited[2] + "-" + splited[1] + "-" + splited[0]);
             }
 
-            console.log(date);
-            console.log(date.year + "-" + date.month + "-" + date.date);
+            //Get Teams - \|[a-z\s\.\à\á\ã\â\è\é\ê\ì\í\ò\ó\õ\ô\ù\ú\ç\«\»]+\s+\x\s+[a-z\s\.\à\á\ã\â\è\é\ê\ì\í\ò\ó\õ\ô\ù\ú\ç\«\»]+\|
+            match = linha.match(/\|[a-z\s\.\à\á\ã\â\è\é\ê\ì\í\ò\ó\õ\ô\ù\ú\ç\«\»]+\s+\x\s+[a-z\s\.\à\á\ã\â\è\é\ê\ì\í\ò\ó\õ\ô\ù\ú\ç\«\»]+\|/g);
+            let str_teams = match.toString();
+            str_teams = str_teams.substring(1, str_teams.length - 1);
+            teams = str_teams.split(/\s+\x\s+/g, 2);
 
+            
         });
 
     });
